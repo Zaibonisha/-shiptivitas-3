@@ -2,40 +2,13 @@
 
 -- PART 1: Create a SQL query that maps out the daily average users before and after the feature change
 
-WITH user_activity_before AS (
-  SELECT
-    DATE(timestamp) AS date,
-    COUNT(DISTINCT user_id) AS users_before
-  FROM
-    user_activity
-  WHERE
-    timestamp < feature_change_date
-  GROUP BY
-    DATE(timestamp)
-),
-user_activity_after AS (
-  SELECT
-    DATE(timestamp) AS date,
-    COUNT(DISTINCT user_id) AS users_after
-  FROM
-    user_activity
-  WHERE
-    timestamp >= feature_change_date
-  GROUP BY
-    DATE(timestamp)
-)
-SELECT
-  COALESCE(ua_before.date, ua_after.date) AS date,
-  COALESCE(users_before, 0) AS users_before,
-  COALESCE(users_after, 0) AS users_after
-FROM
-  user_activity_before ua_before
-FULL OUTER JOIN
-  user_activity_after ua_after
-ON
-  ua_before.date = ua_after.date
-ORDER BY
-  date;
+-- Daily active users
+SELECT 
+    count(distinct user_id) as daily_users,
+    DATE(login_timestamp, 'unixepoch') as login_date,
+    strftime('%j', DATE(login_timestamp, 'unixepoch')) AS day_of_year
+FROM login_history
+GROUP BY day_of_year;
 
 
 
@@ -43,15 +16,9 @@ ORDER BY
 -- PART 2: Create a SQL query that indicates the number of status changes by card
 
 SELECT
-  card_id,
-  status,
-  COUNT(*) AS status_changes
-FROM
-  cards
-GROUP BY
-  card_id, status;
-
-
-
-
+    cardId,
+    count(id) as n_status_change
+FROM card_change_history
+WHERE oldStatus <> newStatus
+GROUP BY cardId;
 
