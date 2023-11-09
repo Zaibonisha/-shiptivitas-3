@@ -39,6 +39,7 @@ ORDER BY
 
 
 
+
 -- PART 2: Create a SQL query that indicates the number of status changes by card
 
 SELECT
@@ -49,6 +50,7 @@ FROM
   cards
 GROUP BY
   card_id, status;
+
 
 
 
